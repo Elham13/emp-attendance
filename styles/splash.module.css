@@ -1,0 +1,26 @@
+.card {
+  display: flex;
+  width: 50%;
+  min-height: 100vh;
+  margin: auto;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.card a {
+  text-decoration: none;
+  background-color: #ec0062;
+  color: #f2f2f2;
+  padding: 10px 20px;
+  display: inline-block;
+  margin-top: 20px;
+  border-radius: 5px;
+  font-size: 11px;
+  transition: all 1s ease-in-out;
+}
+.card a:hover {
+  transform: rotate(360deg) scale(2);
+}
+.card a:active {
+  transform: scale(0.9);
+}
