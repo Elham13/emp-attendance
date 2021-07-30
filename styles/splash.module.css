@@ -1,8 +1,8 @@
 .card {
   display: flex;
   width: 50%;
-  min-height: 100vh;
   margin: auto;
+  min-height: 80vh;
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -23,4 +23,17 @@
 }
 .card a:active {
   transform: scale(0.9);
+}
+
+.navAppBar {
+  background-color: var(--accent) !important;
+}
+.navtoolbar {
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.toolbaInner {
+  display: flex;
+  align-items: center;
 }

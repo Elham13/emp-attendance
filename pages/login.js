@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { generalApi } from "../src/utils/api";
 import Link from "next/link";
+import SnackPopup from "../src/components/SnackPopup";
 
 const login = () => {
   const router = useRouter();
@@ -12,6 +13,23 @@ const login = () => {
     password: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [popup, setPopup] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const closePoput = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setPopup({
+      open: false,
+      message: "",
+      severity: "success",
+    });
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -34,9 +52,18 @@ const login = () => {
         router.push("/home");
       } catch (error) {
         setSubmitting(false);
+
         error.response
-          ? console.log(error.response.data.message)
-          : console.log(error.message);
+          ? setPopup({
+              open: true,
+              message: error.response.data.message,
+              severity: "error",
+            })
+          : setPopup({
+              open: true,
+              message: error.message,
+              severity: "error",
+            });
       }
     } else {
       alert("Make sure all fields are filled");
@@ -45,6 +72,12 @@ const login = () => {
 
   return (
     <div className={styles.wrapper}>
+      <SnackPopup
+        open={popup.open}
+        message={popup.message}
+        severity={popup.severity}
+        handleClose={closePoput}
+      />
       <div className={styles.logoWrapper}>
         <img src='/images/logo.png' alt='logo' />
       </div>
