@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import styles from "../../styles/Home.module.css";
-import { getUser } from "../utils/helpers";
 
 const Clock = () => {
   const [second, setSecond] = useState("00");
@@ -114,6 +113,12 @@ const Clock = () => {
       </div>
     </div>
   );
+};
+
+Clock.getInitialProps = async (ctx) => {
+  const res = await fetch("https://api.github.com/repos/vercel/next.js");
+  const json = await res.json();
+  return { stars: json.stargazers_count };
 };
 
 export default Clock;

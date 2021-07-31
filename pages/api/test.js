@@ -1,9 +1,10 @@
 import dbConnect from "../../server/utils/db";
 import Note from "../../server/modals/Note";
+import { protect } from "../../server/utils/auth";
 
 dbConnect();
 
-export default async (req, res) => {
+export default protect(async (req, res) => {
   const { method } = req;
 
   switch (method) {
@@ -26,4 +27,4 @@ export default async (req, res) => {
     default:
       res.status(500).json({ success: false });
   }
-};
+});

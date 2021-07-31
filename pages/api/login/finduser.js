@@ -1,5 +1,7 @@
+import cookie from "cookie";
 import dbConnect from "../../../server/utils/db";
 import User from "../../../server/modals/User";
+import { generateToken } from "../../../server/utils/auth";
 
 dbConnect();
 
@@ -7,12 +9,31 @@ export default async (req, res) => {
   const { method } = req;
 
   switch (method) {
+    case "GET":
+      try {
+        const users = await User.find({});
+        res.status(200).json({ success: true, users });
+      } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+      }
+      break;
+
     case "POST":
       const { mobileNumber, password } = req.body;
       try {
         const user = await User.findOne({ mobileNumber });
         if (user) {
           if (await user.passwordMatches(password)) {
+            const token = generateToken(user._id);
+            res.setHeader(
+              "Set-Cookie",
+              cookie.serialize("auth", token, {
+                httpOnly: true,
+                sameSite: "strict",
+                maxAge: 259200,
+                path: "/",
+              })
+            );
             res.status(200).json({
               success: true,
               user: {

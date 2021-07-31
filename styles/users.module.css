@@ -1,0 +1,26 @@
+.container {
+  padding: 2rem;
+}
+
+.headWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.containerInner {
+  box-shadow: 0 1px 5px 1px #00000054;
+}
+
+.editBtn {
+  cursor: pointer;
+  background-color: var(--accent);
+  outline: none;
+  border: none;
+  border-radius: 2px;
+  padding: 4px 5px;
+  color: var(--white);
+  font-size: 12px;
+  margin: 0 3px;
+}

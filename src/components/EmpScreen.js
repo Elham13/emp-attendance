@@ -7,66 +7,22 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TablePagination,
   TableRow,
-  TableSortLabel,
   Checkbox,
-  IconButton,
   Button,
 } from "@material-ui/core";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
 import moment from "moment";
 import styles from "../../styles/Home.module.css";
 import { generalApi } from "../utils/api";
-import { headCells, getComparator, stableSort } from "../utils/helpers";
+import { getComparator, stableSort } from "../utils/helpers";
 import Loader from "./Loader";
 import SnackPopup from "./SnackPopup";
+import EnhancedTableHead from "./EnhancedTableHead";
 
-function EnhancedTableHead(props) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
-
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
-
-  return (
-    <TableHead>
-      <TableRow>
-        <TableCell padding='checkbox'>
-          <Checkbox
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{ "aria-label": "select all desserts" }}
-          />
-        </TableCell>
-        {headCells.map((headCell, i) => (
-          <TableCell key={i}>
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : "asc"}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-        <TableCell>Actions</TableCell>
-      </TableRow>
-    </TableHead>
-  );
-}
-
-const EmpScreen = () => {
+export default function EmpScreen() {
+  const source = axios.CancelToken.source();
   const router = useRouter();
   const [user, setUser] = useState({});
   const [dvrs, setDvrs] = useState([]);
@@ -83,12 +39,10 @@ const EmpScreen = () => {
     message: "",
     severity: "success",
   });
-
   const closePoput = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-
     setPopup({
       open: false,
       message: "",
@@ -96,32 +50,37 @@ const EmpScreen = () => {
     });
   };
 
-  const getData = async (id, pageNo) => {
+  const getData = async (id, pageNo, unmounted) => {
     try {
-      setFetching(true);
+      !unmounted && setFetching(true);
       const { data } = await axios.get(
-        `${generalApi}/dvrs?id=${id}&pageNumber=${pageNo}`
+        `${generalApi}/dvrs?id=${id}&pageNumber=${pageNo}`,
+        { cancelToken: source.token }
       );
-      setDvrs(data.dvrs);
-      setPaginate({
-        page: data.page - 1,
-        pages: data.pages,
-      });
-      setFetching(false);
+      if (!unmounted) {
+        setDvrs(data.dvrs);
+        setPaginate({
+          page: data.page - 1,
+          pages: data.pages,
+        });
+        setFetching(false);
+      }
       // console.log("data: ", data);
     } catch (error) {
-      error.response
-        ? setPopup({
-            open: true,
-            severity: "error",
-            message: error.response.data.message,
-          })
-        : setPopup({
-            open: true,
-            severity: "error",
-            message: error.message,
-          });
-      setFetching(false);
+      if (!unmounted) {
+        error.response
+          ? setPopup({
+              open: true,
+              severity: "error",
+              message: error.response.data.message,
+            })
+          : setPopup({
+              open: true,
+              severity: "error",
+              message: error.message,
+            });
+        setFetching(false);
+      }
     }
   };
 
@@ -158,7 +117,6 @@ const EmpScreen = () => {
   const handleClick = (event, id) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
-
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
@@ -171,7 +129,6 @@ const EmpScreen = () => {
         selected.slice(selectedIndex + 1)
       );
     }
-
     setSelected(newSelected);
   };
 
@@ -187,16 +144,20 @@ const EmpScreen = () => {
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
   useEffect(() => {
+    let unmounted = false;
     const u = localStorage.getItem("@user");
     const userr = JSON.parse(u);
     setUser(userr);
-    getData(userr._id);
-  }, []);
+    getData(userr._id, unmounted);
 
+    return () => {
+      unmounted = true;
+      source.cancel("Cancelling in cleanup");
+    };
+  }, []);
   // useEffect(() => {
   //   console.log("paginate: ", user);
   // }, [paginate]);
-
   return (
     <div className={styles.container}>
       <div className={styles.headWrapper}>
@@ -241,7 +202,6 @@ const EmpScreen = () => {
                     (row, index) => {
                       const isItemSelected = isSelected(row._id);
                       const labelId = `enhanced-table-checkbox-${index}`;
-
                       return (
                         <TableRow
                           hover
@@ -330,6 +290,4 @@ const EmpScreen = () => {
       </div>
     </div>
   );
-};
-
-export default EmpScreen;
+}

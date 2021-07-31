@@ -9,8 +9,9 @@ export default async (req, res) => {
   switch (method) {
     case "GET":
       const { id } = req.query;
+      console.log("Id: ", id);
       try {
-        const user = await User.findOne({ _id: id });
+        const user = await User.findById(id);
         if (user) {
           res.status(200).json({ success: true, user });
         } else {
