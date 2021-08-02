@@ -56,3 +56,20 @@
 .editBtn {
   background-color: var(--accent);
 }
+
+.editBtnWrapper {
+  margin: 2rem;
+}
+
+.editUserContainer {
+  padding: 2rem;
+  box-shadow: 0 1px 5px -1px #00000070;
+}
+
+.editUserContainer form {
+  margin: 2rem 0;
+}
+.editUserContainer .btn {
+  margin-top: 1rem;
+  background-color: var(--accent);
+}

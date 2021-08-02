@@ -59,6 +59,25 @@ export default async (req, res) => {
       }
       break;
 
+    case "PUT":
+      try {
+        const user = await User.findById(req.body.id);
+
+        user.fullName = req.body.fullName;
+        user.email = req.body.email;
+        user.mobileNumber = req.body.mobileNumber;
+        user.role = req.body.role;
+        if (req.body.password) user.password = req.body.password;
+        await user.save();
+
+        res
+          .status(201)
+          .json({ success: true, message: "User updated successfully" });
+      } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+      }
+      break;
+
     default:
       res.status(500).json({ success: false });
   }

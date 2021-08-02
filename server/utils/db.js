@@ -11,6 +11,7 @@ const dbConnect = async () => {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: true,
   });
 
   connection.isConnected = db.connections[0].readyState;

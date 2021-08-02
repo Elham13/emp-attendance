@@ -3,6 +3,9 @@ import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
+    activeTime: {
+      type: Array,
+    },
     fullName: {
       type: String,
       required: true,

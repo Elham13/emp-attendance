@@ -8,6 +8,7 @@ import {
   Paper,
 } from "@material-ui/core";
 import axios from "axios";
+import { useRouter } from "next/router";
 import { generalApi } from "../utils/api";
 import Link from "next/link";
 import styles from "../../styles/admin.module.css";
@@ -17,6 +18,7 @@ import Loader from "./Loader";
 
 const AdminScreen = () => {
   const source = axios.CancelToken.source();
+  const router = useRouter();
   const [fetching, setFetching] = useState(false);
   const [users, setUsers] = useState([]);
   const [popup, setPopup] = useState({
@@ -61,10 +63,41 @@ const AdminScreen = () => {
     }
   };
 
-  const handleDelete = (e) => {
+  const deleteUser = async (e, id) => {
     e.stopPropagation();
-    console.log("Delete button clicked");
+    try {
+      const { data } = await axios.delete(`${generalApi}/login?id=${id}`);
+      setPopup({
+        open: true,
+        message: data.message,
+        severity: "success",
+      });
+      getUsers();
+      console.log("Data: ", data);
+    } catch (error) {
+      error.response
+        ? setPopup({
+            open: true,
+            severity: "error",
+            message: error.response.data,
+          })
+        : setPopup({
+            open: true,
+            severity: "error",
+            message: error.message,
+          });
+      console.log("Error: ", error);
+    }
   };
+
+  const handleUpdateUser = (e, id) => {
+    e.stopPropagation();
+    router.push({
+      pathname: "/home/editUser",
+      query: { id: id },
+    });
+  };
+
   const handleRowClick = (e) => {
     console.log("Row clicked");
   };
@@ -121,7 +154,12 @@ const AdminScreen = () => {
                   <TableRow
                     key={row._id}
                     hover
-                    onClick={(event) => handleRowClick(event, row._id)}
+                    onClick={() =>
+                      router.push({
+                        pathname: "/home/userDetails",
+                        query: { id: row._id },
+                      })
+                    }
                   >
                     <TableCell component='th' scope='row'>
                       {i + 1}
@@ -131,13 +169,17 @@ const AdminScreen = () => {
                     <TableCell align='left'>{row.email}</TableCell>
                     <TableCell align='left'>{row.role}</TableCell>
                     <TableCell align='left' className={styles.btnContainer}>
-                      <button title='Edit' className={styles.editBtn}>
+                      <button
+                        title='Edit'
+                        className={styles.editBtn}
+                        onClick={(e) => handleUpdateUser(e, row._id)}
+                      >
                         Edit
                       </button>
                       <button
                         title='Delete'
                         className={styles.deleteBtn}
-                        onClick={handleDelete}
+                        onClick={(e) => deleteUser(e, row._id)}
                       >
                         Delete
                       </button>

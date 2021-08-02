@@ -1,4 +1,6 @@
 import _ from "lodash";
+import axios from "axios";
+import { generalApi } from "./api";
 
 export const headCells = [
   {

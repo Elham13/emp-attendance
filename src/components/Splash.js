@@ -1,9 +1,16 @@
 import router from "next/router";
 import { useEffect, useState } from "react";
 import styles from "../../styles/splash.module.css";
+
 import { getUser } from "../utils/helpers";
 
 const Splash = () => {
+  useEffect(() => {
+    const u = localStorage.getItem("@user");
+    if (u) {
+      router.push("/home");
+    }
+  }, []);
   return (
     <div className={styles.card}>
       <h1>Welcome to GMS Employee Reports</h1>

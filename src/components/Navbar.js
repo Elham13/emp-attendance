@@ -8,6 +8,8 @@ import Button from "@material-ui/core/Button";
 import MenuIcon from "@material-ui/icons/Menu";
 import styles from "../../styles/splash.module.css";
 import router from "next/router";
+import axios from "axios";
+import { generalApi } from "../utils/api";
 
 const Navbar = () => {
   const [user, setUser] = useState({});
@@ -16,7 +18,29 @@ const Navbar = () => {
     router.push("/login");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const u = localStorage.getItem("@user");
+    const c = localStorage.getItem("@clock");
+    const user = JSON.parse(u);
+    const clock = JSON.parse(c);
+
+    try {
+      const { data } = await axios.post(`${generalApi}/login/logout`, {
+        id: user._id,
+        clock: {
+          date: new Date(),
+          hr: clock.hr,
+          min: clock.min,
+          sec: clock.sec,
+          reason: "",
+        },
+      });
+      console.log(data);
+    } catch (error) {
+      error.response
+        ? alert(error.response.data.message)
+        : alert(error.message);
+    }
     localStorage.removeItem("@user");
     localStorage.removeItem("@clock");
     router.push("/login");
